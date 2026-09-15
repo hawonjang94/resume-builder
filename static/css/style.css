@@ -1,0 +1,332 @@
+/* ===================================================
+   AI Resume & Portfolio Builder - 스타일시트 (style.css)
+   초보자도 이해하기 쉬운 명확하고 깔끔한 디자인
+   =================================================== */
+
+/* 1. 기본 스타일 리셋 및 전체 배경 */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #fef9c3; /* 전체 배경: 따뜻하고 산뜻한 파스텔 노란색 유지 */
+    color: #333333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* 2. 전체 레이아웃 컨테이너 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 3. 헤더 영역 */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px 0;
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    color: #1a365d;
+    margin-bottom: 8px;
+}
+
+.header .subtitle {
+    font-size: 1.05rem;
+    color: #4a5568;
+}
+
+/* 4. 메인 콘텐츠: 2단 컬럼 레이아웃 (왼쪽: 폼, 오른쪽: 결과) */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    align-items: start;
+}
+
+/* 5. 카드 공통 스타일 */
+.form-section,
+.result-section {
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* 왼쪽: 정보 입력 화면 (요청하신 연한 하늘색 배경) */
+.form-section {
+    background-color: #f0f9ff; /* 산뜻하고 시원한 연한 하늘색 */
+    border: 1px solid #bae6fd;
+}
+
+/* 오른쪽: 결과 표시 화면 (깔끔한 화이트 카드) */
+.result-section {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+}
+
+.form-section h2,
+.result-section h2 {
+    font-size: 1.35rem;
+    color: #2d3748;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #edf2f7;
+}
+
+/* 6. 폼 컨트롤 스타일 */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+}
+
+.required {
+    color: #e53e3e;
+}
+
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #2d3748;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #3182ce;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* 라디오 버튼 그룹 (Prompt A / B 선택) */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background-color: #e0f2fe;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #bae6fd;
+}
+
+.radio-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-weight: normal;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.radio-label input[type="radio"] {
+    margin-top: 3px;
+}
+
+/* 7. 버튼 스타일 */
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn-primary {
+    width: 100%;
+    background-color: #3182ce;
+    color: #ffffff;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background-color: #2b6cb0;
+}
+
+.btn-secondary {
+    background-color: #edf2f7;
+    color: #2d3748;
+    border: 1px solid #cbd5e0;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+/* 8. 결과 표시 영역 & 버튼 그룹 */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.result-content {
+    word-break: break-word;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 22px;
+    font-family: inherit;
+    font-size: 0.96rem;
+    line-height: 1.75;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+/* 제목(h1) 및 소제목(h2, h3) 강조 스타일 */
+.result-content h1 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 10px 0 16px 0;
+    padding: 10px 14px;
+    background-color: #fef08a; /* 노란색 강조 배경 */
+    border-radius: 8px;
+    border-left: 6px solid #eab308;
+    line-height: 1.4;
+}
+
+.result-content h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 22px 0 12px 0;
+    padding: 8px 12px;
+    background-color: #fffbeb; /* 은은한 연노랑 소제목 배경 */
+    border-radius: 6px;
+    border-left: 4px solid #f59e0b;
+    line-height: 1.4;
+}
+
+.result-content h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #334155;
+    margin: 16px 0 8px 0;
+}
+
+.result-content p {
+    margin-bottom: 12px;
+    line-height: 1.75;
+}
+
+.result-content ul, 
+.result-content ol {
+    margin-left: 24px;
+    margin-bottom: 14px;
+}
+
+.result-content li {
+    margin-bottom: 8px;
+    line-height: 1.7;
+}
+
+.result-content strong {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.result-content hr {
+    border: none;
+    border-top: 2px dashed #cbd5e0;
+    margin: 20px 0;
+}
+
+/* 9. 상태별 영역 (안내, 로딩, 오류) */
+.placeholder-area {
+    padding: 40px 20px;
+    text-align: center;
+    color: #718096;
+    background-color: #f7fafc;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
+}
+
+.loading-area {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.loading-text {
+    margin-top: 15px;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* 회전하는 로딩 스피너 애니메이션 */
+.spinner {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto;
+    border: 4px solid #e2e8f0;
+    border-top: 4px solid #3182ce;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-area {
+    background-color: #fff5f5;
+    border: 1px solid #feb2b2;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.error-text {
+    color: #c53030;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* 요소 숨김 클래스 */
+.hidden {
+    display: none !important;
+}
+
+/* 10. 반응형 디자인 (화면이 좁은 모바일/태블릿 환경) */
+@media (max-width: 850px) {
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+}

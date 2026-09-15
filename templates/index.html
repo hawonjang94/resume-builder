@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume & Portfolio Builder</title>
+    <!-- 외부 스타일시트 연결 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- 마크다운 렌더링 라이브러리 (marked.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 영역 -->
+        <header class="header">
+            <h1>🚀 AI Resume & Portfolio Builder</h1>
+            <p class="subtitle">간단한 정보만 입력하면 Google Gemini AI가 맞춤형 이력서와 포트폴리오를 작성해 드립니다.</p>
+        </header>
+
+        <!-- 메인 콘텐츠 레이아웃 (입력 폼 & 결과 영역) -->
+        <main class="main-content">
+            <!-- 왼쪽: 입력 폼 섹션 -->
+            <section class="form-section">
+                <h2>📝 정보 입력</h2>
+                <form id="resumeForm">
+                    <!-- 이름 -->
+                    <div class="form-group">
+                        <label for="name">이름 <span class="required">*</span></label>
+                        <input type="text" id="name" name="name" placeholder="예: 홍길동" required>
+                    </div>
+
+                    <!-- 지원 직무 -->
+                    <div class="form-group">
+                        <label for="targetRole">지원 직무 <span class="required">*</span></label>
+                        <input type="text" id="targetRole" name="targetRole" placeholder="예: 백엔드 개발자, 데이터 엔지니어" required>
+                    </div>
+
+                    <!-- 희망 문체 (Tone) -->
+                    <div class="form-group">
+                        <label for="tone">문체 스타일 (Tone)</label>
+                        <select id="tone" name="tone">
+                            <option value="전문적이고 신뢰감 있는">전문적이고 신뢰감 있는</option>
+                            <option value="자신감 있고 열정적인">자신감 있고 열정적인</option>
+                            <option value="정중하고 진솔한">정중하고 진솔한</option>
+                            <option value="간결하고 핵심 위주의">간결하고 핵심 위주의</option>
+                        </select>
+                    </div>
+
+                    <!-- 프롬프트 모드 선택 -->
+                    <div class="form-group">
+                        <label>작성 모드 선택</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="promptType" value="A" checked>
+                                <span><strong>Prompt A (일반 모드)</strong>: 표준적이고 읽기 쉬운 균형 잡힌 서술</span>
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="promptType" value="B">
+                                <span><strong>Prompt B (전문가 모드)</strong>: STAR 기법 및 수치화된 성과 극대화</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 경력 사항 -->
+                    <div class="form-group">
+                        <label for="experience">주요 경력 사항 <span class="required">*</span></label>
+                        <textarea id="experience" name="experience" rows="4" placeholder="회사명, 근무 기간, 주요 담당 업무 등을 자유롭게 적어주세요. (신입의 경우 관련 교육이나 인턴 경험)" required></textarea>
+                    </div>
+
+                    <!-- 프로젝트 경험 -->
+                    <div class="form-group">
+                        <label for="projects">프로젝트 경험 <span class="required">*</span></label>
+                        <textarea id="projects" name="projects" rows="4" placeholder="진행했던 프로젝트명, 사용 기술, 해결한 문제 및 성과를 적어주세요." required></textarea>
+                    </div>
+
+                    <!-- 생성 버튼 -->
+                    <button type="submit" id="generateBtn" class="btn btn-primary">
+                        ✨ AI 이력서 & 포트폴리오 생성하기
+                    </button>
+                </form>
+            </section>
+
+            <!-- 오른쪽: 결과 표시 섹션 -->
+            <section class="result-section">
+                <h2>📄 생성 결과</h2>
+
+                <!-- 로딩 표시 영역 (기본 숨김) -->
+                <div id="loadingArea" class="loading-area hidden">
+                    <div class="spinner"></div>
+                    <p class="loading-text">Gemini AI가 이력서와 포트폴리오를 작성 중입니다... (약 5~10초 소요)</p>
+                </div>
+
+                <!-- 오류 메시지 영역 (기본 숨김) -->
+                <div id="errorArea" class="error-area hidden">
+                    <p id="errorMessage" class="error-text"></p>
+                </div>
+
+                <!-- 안내 플레이스홀더 (생성 전 표시) -->
+                <div id="placeholderArea" class="placeholder-area">
+                    <p>👈 왼쪽 폼에 정보를 입력하고 <strong>[생성하기]</strong> 버튼을 누르면 이곳에 완성된 이력서와 포트폴리오가 나타납니다.</p>
+                </div>
+
+                <!-- 실제 결과 표시 영역 (기본 숨김) -->
+                <div id="resultArea" class="result-area hidden">
+                    <!-- 액션 버튼 그룹 (복사, 다운로드) -->
+                    <div class="button-group">
+                        <button id="copyBtn" class="btn btn-secondary">📋 결과 복사</button>
+                        <button id="downloadBtn" class="btn btn-secondary">💾 Markdown 다운로드 (.md)</button>
+                    </div>
+
+                    <!-- 마크다운 렌더링 출력 창 -->
+                    <div id="resultContent" class="result-content"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 외부 자바스크립트 연결 -->
+    <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+</body>
+</html>

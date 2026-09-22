@@ -23,8 +23,27 @@ if GEMINI_API_KEY and GEMINI_API_KEY.strip() != "your_gemini_api_key_here":
 else:
     logger.warning(".env 파일에 올바른 GEMINI_API_KEY가 설정되지 않았습니다.")
 
-# 4. Flask 웹 애플리케이션 생성
-app = Flask(__name__)
+# 4. Flask 웹 애플리케이션 생성 (로컬 및 Vercel 서버리스 환경 경로 호환)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
+)
+
+
+@app.route("/manifest.json")
+def manifest():
+    """PWA 매니페스트 서빙"""
+    return app.send_static_file("manifest.json")
+
+
+@app.route("/sw.js")
+def service_worker():
+    """PWA 서비스 워커 서빙 (루트 스코프 적용)"""
+    response = app.send_static_file("sw.js")
+    response.headers["Content-Type"] = "application/javascript"
+    return response
 
 
 @app.route("/")

@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Resume & Portfolio Builder</title>
+    <!-- PWA 메타태그 및 매니페스트 -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <!-- 외부 스타일시트 연결 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- 마크다운 렌더링 라이브러리 (marked.js) -->
@@ -117,5 +123,16 @@
 
     <!-- 외부 자바스크립트 연결 -->
     <script src="{{ url_for('static', filename='js/app.js') }}" defer></script>
+
+    <!-- PWA Service Worker 등록 스크립트 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('PWA Service Worker registered:', reg.scope))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
 </html>

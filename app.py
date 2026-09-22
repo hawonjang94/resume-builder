@@ -47,13 +47,27 @@ def service_worker():
 
 
 @app.route("/")
+@app.route("/api")
+@app.route("/api/index")
+@app.route("/api/index.py")
 def index():
     """메인 화면 렌더링"""
     logger.info("메인 페이지(/) 요청 접수")
     return render_template("index.html")
 
 
+@app.errorhandler(404)
+def handle_404(e):
+    """미등록 경로 접근 시 메인 화면으로 안전하게 폴백"""
+    logger.warning(f"미등록 경로 요청({request.path}) -> 메인 화면으로 안내")
+    if request.path.endswith("/generate") and request.method == "POST":
+        return generate()
+    return render_template("index.html")
+
+
 @app.route("/generate", methods=["POST"])
+@app.route("/api/generate", methods=["POST"])
+@app.route("/api/index.py/generate", methods=["POST"])
 def generate():
     """이력서 및 포트폴리오 생성 API 엔드포인트"""
     try:

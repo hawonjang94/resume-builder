@@ -1,8 +1,9 @@
-const CACHE_NAME = "resume-builder-v1";
+const CACHE_NAME = "resume-builder-v2";
 const STATIC_ASSETS = [
   "/",
   "/static/css/style.css",
   "/static/js/app.js",
+  "/static/js/marked.min.js",
   "/manifest.json",
   "/static/icons/icon-192.png",
   "/static/icons/icon-512.png"

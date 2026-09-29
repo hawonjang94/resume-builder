@@ -58,9 +58,14 @@ def index():
 
 @app.errorhandler(404)
 def handle_404(e):
-    """미등록 경로 접근 시 메인 화면으로 안전하게 폴백"""
-    logger.warning(f"미등록 경로 요청({request.path}) -> 메인 화면으로 안내")
-    if request.path.endswith("/generate") and request.method == "POST":
+    """미등록 경로 접근 시 메인 화면으로 안전하게 폴백 (정적 리소스 제외)"""
+    path = request.path
+    if path.startswith("/static/") or any(path.endswith(ext) for ext in [".css", ".js", ".png", ".jpg", ".ico", ".json", ".map"]):
+        logger.warning(f"정적 파일 누락 404({path})")
+        return "Not Found", 404
+
+    logger.warning(f"미등록 경로 요청({path}) -> 메인 화면으로 안내")
+    if path.endswith("/generate") and request.method == "POST":
         return generate()
     return render_template("index.html")
 

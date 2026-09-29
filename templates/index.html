@@ -12,8 +12,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <!-- 외부 스타일시트 연결 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- 마크다운 렌더링 라이브러리 (marked.js) -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 마크다운 렌더링 라이브러리 (marked.js 로컬 서빙) -->
+    <script src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
 </head>
 <body>
     <div class="container">

@@ -46,12 +46,15 @@ def service_worker():
     return response
 
 
-@app.route("/")
-@app.route("/api")
-@app.route("/api/index")
-@app.route("/api/index.py")
+@app.route("/", methods=["GET", "POST"])
+@app.route("/api", methods=["GET", "POST"])
+@app.route("/api/index", methods=["GET", "POST"])
+@app.route("/api/index.py", methods=["GET", "POST"])
 def index():
-    """메인 화면 렌더링"""
+    """메인 화면 렌더링 (POST 요청 시 자동 생성 처리)"""
+    if request.method == "POST":
+        logger.info("메인 경로(/)로 접수된 POST 요청 -> generate() 자동 연결")
+        return generate()
     logger.info("메인 페이지(/) 요청 접수")
     return render_template("index.html")
 

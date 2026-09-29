@@ -17,8 +17,12 @@
       "destination": "/static/icons/icon-192.png"
     },
     {
+      "source": "/generate",
+      "destination": "/api/index.py/generate"
+    },
+    {
       "source": "/(.*)",
-      "destination": "/api/index.py"
+      "destination": "/api/index.py/$1"
     }
   ]
 }

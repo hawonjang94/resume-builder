@@ -92,11 +92,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify(payload)
             });
 
-            const data = await response.json();
+            let data = null;
+            const responseText = await response.text();
+            try {
+                data = JSON.parse(responseText);
+            } catch (jsonErr) {
+                console.error("서버 응답 파싱 실패:", responseText);
+                showError(`서버 통신 오류 (HTTP ${response.status}): ${responseText.substring(0, 120)}`);
+                return;
+            }
 
             // HTTP 응답 상태가 정상이 아닌 경우 처리
             if (!response.ok) {
-                const errorText = data.error || "알 수 없는 오류가 발생했습니다.";
+                const errorText = (data && data.error) ? data.error : `서버 오류 (HTTP ${response.status})`;
                 showError(`[오류] ${errorText}`);
                 return;
             }

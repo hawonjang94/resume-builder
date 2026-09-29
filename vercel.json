@@ -1,6 +1,22 @@
 {
   "rewrites": [
     {
+      "source": "/static/(.*)",
+      "destination": "/static/$1"
+    },
+    {
+      "source": "/manifest.json",
+      "destination": "/manifest.json"
+    },
+    {
+      "source": "/sw.js",
+      "destination": "/sw.js"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/static/icons/icon-192.png"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/index.py"
     }

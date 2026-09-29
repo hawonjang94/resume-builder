@@ -1,5 +1,7 @@
 import os
 import logging
+import json
+import urllib.request
 from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
 import google.generativeai as genai
@@ -7,6 +9,7 @@ import google.generativeai as genai
 # 1. 환경변수 로드 (.env 파일에서 API 키 읽기)
 load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+SERPER_API_KEY = os.getenv("SERPER_API_KEY")
 
 # 2. 백엔드 로깅 설정 (요청, 응답, 오류를 콘솔에 출력)
 logging.basicConfig(
@@ -22,6 +25,64 @@ if GEMINI_API_KEY and GEMINI_API_KEY.strip() != "your_gemini_api_key_here":
     logger.info("Gemini API가 성공적으로 설정되었습니다.")
 else:
     logger.warning(".env 파일에 올바른 GEMINI_API_KEY가 설정되지 않았습니다.")
+
+# Serper.dev API 상태 로깅
+if SERPER_API_KEY and SERPER_API_KEY.strip() != "your_serper_api_key_here":
+    logger.info("Serper.dev 구글 검색 API가 활성화되었습니다.")
+else:
+    logger.info("SERPER_API_KEY가 등록되지 않아 기본 AI 모드로 동작합니다.")
+
+
+def search_job_market_trends(company="", role=""):
+    """Serper.dev API를 활용한 실시간 채용 공고 & 기술 스택 구글 검색"""
+    if not SERPER_API_KEY or SERPER_API_KEY.strip() == "your_serper_api_key_here":
+        return None
+
+    query_parts = []
+    if company:
+        query_parts.append(company)
+    if role:
+        query_parts.append(role)
+    query_parts.append("채용 자격요건 우대사항 기술스택")
+    query = " ".join(query_parts).strip()
+
+    logger.info(f"Serper.dev 실시간 구글 검색 시작: '{query}'")
+    try:
+        url = "https://google.serper.dev/search"
+        headers = {
+            "X-API-KEY": SERPER_API_KEY.strip(),
+            "Content-Type": "application/json"
+        }
+        payload = json.dumps({
+            "q": query,
+            "gl": "kr",
+            "hl": "ko",
+            "num": 4
+        }).encode("utf-8")
+
+        req = urllib.request.Request(url, data=payload, headers=headers, method="POST")
+        with urllib.request.urlopen(req, timeout=5) as response:
+            result = json.loads(response.read().decode("utf-8"))
+
+        organic = result.get("organic", [])
+        if not organic:
+            return None
+
+        snippets = []
+        for item in organic[:4]:
+            title = item.get("title", "")
+            snippet = item.get("snippet", "")
+            if snippet:
+                snippets.append(f"• {title}: {snippet}")
+
+        if snippets:
+            logger.info(f"Serper.dev 실시간 검색 성공: {len(snippets)}건 수집")
+            return "\n".join(snippets)
+        return None
+
+    except Exception as e:
+        logger.warning(f"Serper.dev 검색 중 예외 발생 (기본 생성으로 계속 진행): {e}")
+        return None
 
 # 4. Flask 웹 애플리케이션 생성 (로컬 및 Vercel 서버리스 환경 경로 호환)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -87,6 +148,7 @@ def generate():
 
         name = data.get("name", "").strip()
         target_role = data.get("target_role", "").strip()
+        target_company = data.get("target_company", "").strip()
         experience = data.get("experience", "").strip()
         projects = data.get("projects", "").strip()
         tone = data.get("tone", "전문적인").strip()
@@ -113,9 +175,13 @@ def generate():
                 "error": ".env 파일에 유효한 Gemini API 키가 설정되지 않았습니다. .env 파일을 확인해 주세요."
             }), 500
 
+        # Serper.dev 실시간 채용 트렌드 & 기업 정보 검색 수행
+        search_trends = search_job_market_trends(company=target_company, role=target_role)
+
+        company_desc = f" (지원 희망 기업: {target_company})" if target_company else ""
         logger.info(
-            f"생성 요청 시작 -> 이름: {name}, 직무: {target_role}, "
-            f"톤: {tone}, 프롬프트 타입: {prompt_type}"
+            f"생성 요청 시작 -> 이름: {name}, 직무: {target_role}{company_desc}, "
+            f"톤: {tone}, 프롬프트 타입: {prompt_type}, 실시간 검색 활용: {bool(search_trends)}"
         )
 
         # 프롬프트 엔지니어링: Prompt A(일반) vs Prompt B(전문가)
@@ -130,7 +196,8 @@ def generate():
                 "2. 각 섹션, 소제목, 주요 항목마다 내용과 잘 어울리는 다양하고 센스 있는 이모지(💼, 🚀, 🛠️, 📈, 💡, 🎯, ✨ 등)를 적극 활용하세요.\n"
                 "3. STAR(Situation, Task, Action, Result) 기법을 엄격히 적용하여 경험을 재구성하세요.\n"
                 "4. 단순한 업무 나열을 배제하고, 기여도와 임팩트를 구체적인 수치와 지표로 나타내세요.\n"
-                "5. 핵심 단어나 항목 이름은 볼드체(**단어**)로 강조하세요."
+                "5. 지원 대상 기업이나 직무의 최신 채용 공고/기술 스택 검색 결과가 제공된 경우, 이를 분석하여 해당 기업/직무의 인재상과 요구 역량에 부합하도록 내용을 전략적으로 최적화하세요.\n"
+                "6. 핵심 단어나 항목 이름은 볼드체(**단어**)로 강조하세요."
             )
         else:
             # Prompt A: 일반 모드 (표준적이고 균형 잡힌 명확한 서술)
@@ -141,9 +208,18 @@ def generate():
                 "[작성 가이드라인]\n"
                 "1. 메인 제목은 '#', 각 소제목은 '##'으로 작성하여 한눈에 들어오게 구성하세요.\n"
                 "2. 각 제목과 핵심 항목마다 어울리는 다채로운 이모지(🌟, 📌, 💼, 🎓, 💻, 🏆 등)를 풍성하게 사용하여 친근하고 읽기 즐겁게 꾸며주세요.\n"
-                "3. 명확하고 정돈된 문장으로 강점을 표현하세요.\n"
-                "4. 핵심 항목명은 볼드체(**항목**)로 강조하세요."
+                "3. 최신 채용 정보가 제공된 경우 해당 요구 사항을 자연스럽게 반영하여 강점을 돋보이게 하세요.\n"
+                "4. 명확하고 정돈된 문장으로 강점을 표현하세요.\n"
+                "5. 핵심 항목명은 볼드체(**항목**)로 강조하세요."
             )
+
+        search_context_block = ""
+        if search_trends:
+            search_context_block = f"""
+[실시간 구글 검색 채용 트렌드 & 기업 분석 데이터]
+{search_trends}
+* 위 실시간 검색 정보를 참고하여, 해당 기업/직무에서 요구하는 핵심 기술 스택과 키워드를 이력서와 포트폴리오의 '핵심 역량' 및 '성과 기술'에 적극적으로 반영하세요.
+"""
 
         user_content = f"""
 {system_instruction}
@@ -151,8 +227,9 @@ def generate():
 [지원자 정보]
 - 이름: {name}
 - 지원 직무: {target_role}
+{f"- 지원 희망 기업: {target_company}" if target_company else ""}
 - 문체 스타일(Tone): {tone}
-
+{search_context_block}
 [경력 사항]
 {experience}
 

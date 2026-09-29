@@ -41,6 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // 입력값 가져오기
         const name = document.getElementById("name").value.trim();
         const targetRole = document.getElementById("targetRole").value.trim();
+        const targetCompanyInput = document.getElementById("targetCompany");
+        const targetCompany = targetCompanyInput ? targetCompanyInput.value.trim() : "";
         const tone = document.getElementById("tone").value;
         const promptTypeRadio = document.querySelector('input[name="promptType"]:checked');
         const promptType = promptTypeRadio ? promptTypeRadio.value : "A";
@@ -70,12 +72,19 @@ document.addEventListener("DOMContentLoaded", () => {
         resultArea.classList.add("hidden");
         loadingArea.classList.remove("hidden");
         generateBtn.disabled = true;
-        generateBtn.textContent = "⏳ Gemini AI가 작성 중입니다...";
+        if (targetCompany) {
+            generateBtn.textContent = `🔍 ${targetCompany} 채용 정보 검색 및 AI 작성 중...`;
+            document.querySelector(".loading-text").textContent = `Google에서 '${targetCompany}'의 최신 채용 트렌드를 검색하여 맞춤 이력서를 생성 중입니다...`;
+        } else {
+            generateBtn.textContent = "⏳ Gemini AI가 작성 중입니다...";
+            document.querySelector(".loading-text").textContent = "Gemini AI가 이력서와 포트폴리오를 작성 중입니다... (약 5~10초 소요)";
+        }
 
         // 서버로 전송할 페이로드 데이터 구성
         const payload = {
             name: name,
             target_role: targetRole,
+            target_company: targetCompany,
             tone: tone,
             prompt_type: promptType,
             experience: experience,

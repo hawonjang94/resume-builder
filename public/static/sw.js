@@ -1,4 +1,4 @@
-const CACHE_NAME = "resume-builder-v2";
+const CACHE_NAME = "resume-builder-v3";
 const STATIC_ASSETS = [
   "/",
   "/static/css/style.css",
